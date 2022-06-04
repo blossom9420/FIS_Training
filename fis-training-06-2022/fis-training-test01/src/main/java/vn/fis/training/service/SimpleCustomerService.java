@@ -14,10 +14,20 @@ public class SimpleCustomerService implements CustomerService {
 
     private InMemoryCustomerStore customerStore;
 
+    // em thêm getter/ setter chỗ này không biết có bị sai design pattern ko ạ
+    // em thêm vào để trong unit test, em khởi tạo list và thực hiện các hàm trong service
+    public InMemoryCustomerStore getCustomerStore() {
+        return customerStore;
+    }
+
+    public void setCustomerStore(InMemoryCustomerStore customerStore) {
+        this.customerStore = customerStore;
+    }
+
     @Override
     public Customer findById(String id) {
         //TODO: Implement method tho dung dac ta cua CustomerService interface
-        if (isNullOrEmpty(id)) {
+        if (isNullOrEmpty(id) == true) {
             throw new IllegalArgumentException("Không thể tìm kiếm với empty ID");
         }
         // cách nông dân
@@ -42,9 +52,9 @@ public class SimpleCustomerService implements CustomerService {
 
     private boolean isNullOrEmpty(String id) {
         if (id == null || id.trim().length() == 0) {
-            return false;
-        } else {
             return true;
+        } else {
+            return false;
         }
     }
 
@@ -60,63 +70,75 @@ public class SimpleCustomerService implements CustomerService {
     }
 
     private void checkDuplicate(Customer customer) {
-        try{
-            if (customerStore.findAll().stream().anyMatch(cust ->{
-                return cust.getMobile().equals(customer.getMobile());
-            })){
-                throw  new DuplicateCustomerException(customer, String.format(" Customer with phone number %s is duplicated. ",customer.getMobile()));
-            }
-        }catch (CustomerNotFoundException customerNotFoundException){
-            // NOOP
+
+        if (customerStore.findAll().stream().anyMatch(cust -> {
+            return cust.getMobile().equals(customer.getMobile());
+        })) {
+            throw new DuplicateCustomerException(customer, String.format(" Customer with phone number %s is duplicated. ", customer.getMobile()));
+
         }
     }
 
     private void validate(Customer customer) {
-        if(isNullOrEmpty(customer.getName())){
-            throw new InvalidCustomerException(customer,"Customer name is empty");
+        if (isNullOrEmpty(customer.getName())) {
+            throw new InvalidCustomerException(customer, "Customer name is empty");
         }
-        if(isNullOrEmpty(customer.getMobile())){
-            throw new InvalidCustomerException(customer,"Customer mobile is empty");
+        if (isNullOrEmpty(customer.getMobile())) {
+            throw new InvalidCustomerException(customer, "Customer mobile is empty");
         }
         int checkName = customer.checkName(customer.getName());
-        switch (checkName){
-            case 0: throw new InvalidCustomerException(customer,"Customer name is empty");
-            case -1: throw new InvalidCustomerException(customer," Length of name must be between 5 and 50");
-            case -2: throw new InvalidCustomerException(customer," Name is only alphabet");
+        switch (checkName) {
+            case 0:
+                throw new InvalidCustomerException(customer, "Customer name is empty");
+            case -1:
+                throw new InvalidCustomerException(customer, " Length of name must be between 5 and 50");
+            case -2:
+                throw new InvalidCustomerException(customer, " Name is only alphabet");
             default:  // = 1 : pass
                 break;
         }
 
         int checkBirthday = customer.checkBirthDay(customer.getBirthDay());
-        switch (checkBirthday){
-            case 0: throw new InvalidCustomerException(customer,"Customer dob is empty");
-            case -1: throw new InvalidCustomerException(customer," Age must be >= 10");
+        switch (checkBirthday) {
+            case 0:
+                throw new InvalidCustomerException(customer, "Customer dob is empty");
+            case -1:
+                throw new InvalidCustomerException(customer, " Age must be >= 10");
             default:  // = 1 : pass
                 break;
         }
 
         int checkMobile = customer.checkMobile(customer.getMobile());
-        switch (checkMobile){
-            case 0: throw new InvalidCustomerException(customer,"Phone number must be start with 0 ");
-            case -1: throw new InvalidCustomerException(customer," Length of phone number must be 10");
-            case -2: throw new InvalidCustomerException(customer," Phone number must be only number");
+        switch (checkMobile) {
+            case 0:
+                throw new InvalidCustomerException(customer, "Phone number must be start with 0 ");
+            case -1:
+                throw new InvalidCustomerException(customer, " Length of phone number must be 10");
+            case -2:
+                throw new InvalidCustomerException(customer, " Phone number must be only number");
             default:  // = 1 : pass
                 break;
         }
 
         int checkStatus = customer.CheckStatus(customer.getStatus());
-        if(checkStatus == 0){
-            throw new InvalidCustomerException(customer,"Status is null ");
+        if (checkStatus == 0) {
+            throw new InvalidCustomerException(customer, "Status is null ");
         }
 
     }
 
     @Override
     public Customer updateCustomer(Customer customer) {
-        // validate(customer)
-        // checkExist(customer)
+         validate(customer);
+         checkExist(customer);
         //TODO: Implement method tho dung dac ta cua CustomerService interface
         return customerStore.insertOrUpdate(customer);
+    }
+
+    private void checkExist(Customer customer) {
+        if(this.findById(customer.getId()) == null ){
+            throw new CustomerNotFoundException(customer, String.format(" Customer is not found with id: %s . ", customer.getId()));
+        }
     }
 
     @Override
@@ -125,8 +147,8 @@ public class SimpleCustomerService implements CustomerService {
         if (isNullOrEmpty(id)) {
             throw new IllegalArgumentException(" Khong the xoa voi empty id");
         }
-        findById(id);
-        customerStore, deleteCustomerById(id);
+        checkExist(findById(id));
+        customerStore.deleteById(id);
     }
 
     @Override

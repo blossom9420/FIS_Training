@@ -211,4 +211,16 @@ public class Customer {
     public int hashCode() {
         return Objects.hash(id, name, birthDay, mobile, status, createDateTime);
     }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", birthDay=" + birthDay +
+                ", mobile='" + mobile + '\'' +
+                ", status=" + status +
+                ", createDateTime=" + createDateTime +
+                '}' +"\n";
+    }
 }
