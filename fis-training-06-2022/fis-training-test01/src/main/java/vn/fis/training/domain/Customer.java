@@ -226,4 +226,10 @@ public class Customer {
                 ", createDateTime=" + createDateTime +
                 '}' +"\n";
     }
+
+    public long getAge(){
+        LocalDate now = LocalDate.now();
+        long age = ChronoUnit.YEARS.between(this.getBirthDay(), now);
+        return age;
+    }
 }

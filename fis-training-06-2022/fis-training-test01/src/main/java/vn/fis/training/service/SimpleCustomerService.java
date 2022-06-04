@@ -8,6 +8,7 @@ import vn.fis.training.store.InMemoryCustomerStore;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -196,8 +197,35 @@ public class SimpleCustomerService implements CustomerService {
     @Override
     public List<SummaryCustomerByAgeDTO> summaryCustomerByAgeOrderByAgeDesc() {
         //TODO: Implement method tho dung dac ta cua CustomerService interface
+        //1. lấy ra danh sách tuổi có sắp xếp
+        List<Customer> listCus = customerStore.findAll().stream()
+                .sorted(Comparator.comparing(Customer::getAge))
+                .collect(Collectors.toList());
 
-        return null;
+
+        // thêm vào danh sách Summary
+        List<SummaryCustomerByAgeDTO> listSummary = new ArrayList<>();
+        for(int i = 0 ; i< listCus.size() ; i++){
+            SummaryCustomerByAgeDTO summary = new SummaryCustomerByAgeDTO();
+            summary.setAge( (int)listCus.get(i).getAge());
+            int indexSummary = checkSummaryInList(listSummary,summary);
+            if( indexSummary== -1){
+                listSummary.add(summary);
+            }else{
+                int count = listSummary.get(indexSummary).getCount();
+                listSummary.get(indexSummary).setCount(count+1);
+            }
+        }
+        return listSummary;
+    }
+
+    int checkSummaryInList( List<SummaryCustomerByAgeDTO> listSummary, SummaryCustomerByAgeDTO summary){
+        for(int i = 0 ; i < listSummary.size() ; i++){
+            if(listSummary.get(i).getAge()== summary.getAge()){
+                return i;
+            }
+        }
+        return -1;
     }
 
 }

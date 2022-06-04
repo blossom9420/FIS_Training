@@ -6,7 +6,7 @@ public class SummaryCustomerByAgeDTO {
     //TODO: Setters, Getter, Constructors
 
     public SummaryCustomerByAgeDTO() {
-
+        this.count = 1;
     }
 
     public SummaryCustomerByAgeDTO(int age, int count) {
@@ -30,9 +30,11 @@ public class SummaryCustomerByAgeDTO {
         this.count = count;
     }
 
-    public void check(int age){
-        if(this.age == age){
-            this.count == this.count++;
-        }
+    @Override
+    public String toString() {
+        return "SummaryCustomerByAgeDTO{" +
+                "age=" + age +
+                ", count=" + count +
+                '}' +"\n";
     }
 }
