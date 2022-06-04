@@ -6,6 +6,8 @@ import vn.fis.training.exception.DuplicateCustomerException;
 import vn.fis.training.exception.InvalidCustomerException;
 import vn.fis.training.store.InMemoryCustomerStore;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,13 +66,14 @@ public class SimpleCustomerService implements CustomerService {
         validate(customer);
         checkDuplicate(customer);
         // chuẩn hóa :standardize
-        String standardize = customer.standardize(customer.getName());
-        customer.setName(standardize);
+        String standardizeName = customer.standardizeName(customer.getName());
+        String standardizeMobile = customer.standardizeMobile(customer.getMobile());
+        customer.setName(standardizeName);
+        customer.setMobile(standardizeMobile);
         return customerStore.insertOrUpdate(customer);
     }
 
     private void checkDuplicate(Customer customer) {
-
         if (customerStore.findAll().stream().anyMatch(cust -> {
             return cust.getMobile().equals(customer.getMobile());
         })) {
@@ -129,15 +132,19 @@ public class SimpleCustomerService implements CustomerService {
 
     @Override
     public Customer updateCustomer(Customer customer) {
-         validate(customer);
-         checkExist(customer);
+        validate(customer);
+        //checkExist(customer); ko cần vì map tự put đè nếu tồn tại, và sẽ tạo mới nếu ko tồn tại
+        String standardizeName = customer.standardizeName(customer.getName());
+        String standardizeMobile = customer.standardizeMobile(customer.getMobile());
+        customer.setName(standardizeName);
+        customer.setMobile(standardizeMobile);
         //TODO: Implement method tho dung dac ta cua CustomerService interface
         return customerStore.insertOrUpdate(customer);
     }
 
     private void checkExist(Customer customer) {
-        if(this.findById(customer.getId()) == null ){
-            throw new CustomerNotFoundException(customer, String.format(" Customer is not found with id: %s . ", customer.getId()));
+        if (this.findById(customer.getId()) == null) {
+            throw new CustomerNotFoundException("Khong ton tai customer nay");
         }
     }
 
@@ -169,14 +176,27 @@ public class SimpleCustomerService implements CustomerService {
     }
 
     @Override
-    public List<Customer> findAllCustomerByNameLikeOrderByNameAsc(String custName, String limit) {
+    public List<Customer> findAllCustomerByNameLikeOrderByNameAsc(String custName, int limit) {
         //TODO: Implement method tho dung dac ta cua CustomerService interface
-        return null;
+        return customerStore.findAll().stream().filter(customer -> {
+                    String name = customer.getName().toUpperCase();
+                    return name.contains(custName.toUpperCase());
+                })
+                .sorted(Comparator.comparing(Customer::getName))
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 
+
+    /**
+     * trả về danh sách tuổi và số lượng người của tuổi đó, vd: tuổi 18 có 3 người -> age=18 , count=3
+     *
+     * @return
+     */
     @Override
     public List<SummaryCustomerByAgeDTO> summaryCustomerByAgeOrderByAgeDesc() {
         //TODO: Implement method tho dung dac ta cua CustomerService interface
+
         return null;
     }
 

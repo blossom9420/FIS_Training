@@ -56,7 +56,7 @@ public interface CustomerService {
      * @param limit : So luong toi da Customer duoc tra ve
      * @return : danh sach  limit customer trong he thong order by name giam dan (theo thu tu abc). Return emptyList neu khong co doi tuong nao
      * */
-    List<Customer> findAllCustomerByNameLikeOrderByNameAsc(String custName, String limit);
+    List<Customer> findAllCustomerByNameLikeOrderByNameAsc(String custName, int limit);
 
     /**
      * Ham thu hien tim kiem tat ca danh sach customer trong he thong. Tong hop theo do tuoi cua khach hang

@@ -19,10 +19,10 @@ class CustomerTest {
     }
 
     @Test
-    void standardize() {
+    void standardizeName() {
         Customer cus = new Customer();
         String s = "  NgUyen van a";
-        String rs = cus.standardize(s);
+        String rs = cus.standardizeName(s);
         System.out.println(rs);
         assertEquals("Nguyen Van A",rs);
     }
@@ -55,5 +55,14 @@ class CustomerTest {
         CustomerStatus c =  CustomerStatus.ACTIVE;
         int kq = cus.CheckStatus(c);
         System.out.println(c);
+    }
+
+    @Test
+    void standardizeMobile() {
+        Customer cus = new Customer();
+        String mobile = " 1515 251";
+        String standardize = cus.standardizeMobile(mobile);
+        System.out.println(standardize);
+        assertEquals("1515251", standardize);
     }
 }

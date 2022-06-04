@@ -55,10 +55,10 @@ public class Customer {
     }
 
     // N Nguyen Van A
-    public String standardize(String name) {
+    public String standardizeName(String name) {
         String name_trim = name.trim(); // cắt bỏ khoảng trắng ở đầu và cuối
         StringBuffer temp = new StringBuffer();
-        temp.append(name_trim.charAt(0));
+        temp.append(Character.toUpperCase(name_trim.charAt(0)));
 
         boolean isCharacter = true;
         for (int i = 1; i < name_trim.length(); i++) {
@@ -124,6 +124,9 @@ public class Customer {
         return 1;
     }
 
+    public String standardizeMobile(String mobile) {
+        return mobile.replaceAll(" ", "");
+    }
 
     /**
      * Constraints:
